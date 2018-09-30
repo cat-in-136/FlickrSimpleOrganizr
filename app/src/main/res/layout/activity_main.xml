@@ -12,4 +12,12 @@
         android:layout_margin="20dp"
         android:onClick="startLoginToFlickr"
         android:text="@string/login_label" />
-    </LinearLayout>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:onClick="startSettingActivity"
+        android:text="Setting" />
+</LinearLayout>

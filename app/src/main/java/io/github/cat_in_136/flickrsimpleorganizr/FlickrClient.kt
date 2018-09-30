@@ -21,10 +21,10 @@ class FlickrClient : CoroutineScope {
 
     public var accessToken : OAuth1AccessToken? = null
 
-    constructor (parentJob: Job?) {
+    constructor (apiKey: String, sharedSecret: String, parentJob: Job?) {
         this.job = Job(parentJob)
-        this.oauthService = ServiceBuilder(API_KEY)
-                .apiSecret(SHARED_SECRET)
+        this.oauthService = ServiceBuilder(apiKey)
+                .apiSecret(sharedSecret)
                 .build(FlickrApi.instance(FlickrApi.FlickrPerm.WRITE))
     }
 
@@ -62,10 +62,5 @@ class FlickrClient : CoroutineScope {
                 }
             }, null)
         }
-    }
-
-    companion object {
-        internal val API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        internal val SHARED_SECRET = "xxxxxxxxxxxxxxxx"
     }
 }

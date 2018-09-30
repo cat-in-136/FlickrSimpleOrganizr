@@ -1,8 +1,20 @@
 <resources>
     <string name="app_name">FlickrSimpleOrganizr</string>
     <string name="login_label">Login</string>
+    <string name="login_oauth_setting_missing_err_msg">Specify OAuth App Setting (Key and Secret)</string>
     <string name="login_verify_key_label">Enter verifier code</string>
     <string name="login_verify_key_hint">XXX-XXX-XXX</string>
     <string name="login_verify_key_err_msg">Wrong verifier code</string>
     <string name="login_verify_ok">Verify</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <string name="pref_header_account">Account</string>
+    <string name="pref_category_account_oauth_app">OAuth App</string>
+    <string name="pref_title_account_oauth_api_key">Key</string>
+    <string name="pref_title_account_oauth_shared_secret">Secret</string>
+
+    <!-- Strings related to Settings -->
+
 </resources>

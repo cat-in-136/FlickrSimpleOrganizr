@@ -5,6 +5,8 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.Preference
+import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
 import android.text.TextUtils
 import android.util.Log
@@ -15,6 +17,7 @@ import com.github.scribejava.core.model.OAuthRequest
 import com.github.scribejava.core.model.Verb
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.Main
+import org.w3c.dom.Text
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.suspendCoroutine
 
@@ -35,7 +38,24 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
     fun startLoginToFlickr(view : View) {
         async {
-            val flickrClient = FlickrClient(job)
+            val (apiKey, sharedSecret) = PreferenceManager.getDefaultSharedPreferences(this@MainActivity).let {
+                Pair(
+                    it.getString(SettingsActivity.AccountPreferenceFragment.KEY_OAUTH_API_KEY, ""),
+                    it.getString(SettingsActivity.AccountPreferenceFragment.KEY_OAUTH_SHARED_SECRET, "")
+                )
+            }
+            if (TextUtils.isEmpty(apiKey) || TextUtils.isEmpty(sharedSecret)) {
+                suspendCoroutine<Nothing?> { continuation ->
+                    AlertDialog.Builder(this@MainActivity)
+                            .setMessage(R.string.login_oauth_setting_missing_err_msg)
+                            .setPositiveButton(android.R.string.ok, null)
+                            .setOnDismissListener({ continuation.resume(null) })
+                            .show()
+                }
+                launch { startSettingActivity(view) }
+                return@async
+            }
+            val flickrClient = FlickrClient(apiKey, sharedSecret, job)
 
             val (requestToken, authUrl) = flickrClient.userAuthStep1To2().await()
             val authViewIntent = Intent(Intent.ACTION_VIEW, Uri.parse(authUrl))
@@ -65,7 +85,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 }
 
                 if (TextUtils.isEmpty(verifyCode)) {
-                    return@async;
+                    return@async
                 } else {
                     try {
                         accessToken = flickrClient.userAuthStep3(requestToken, verifyCode).await()
@@ -103,5 +123,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 }
             }
         }
+    }
+
+    fun startSettingActivity(view: View) {
+        val intent = Intent(this, SettingsActivity::class.java)
+        startActivity(intent)
     }
 }
