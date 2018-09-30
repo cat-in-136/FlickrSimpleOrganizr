@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">FlickrSimpleOrganizr</string>
+    <string name="login_label">Login</string>
+    <string name="login_verify_key_label">Enter verifier code</string>
+    <string name="login_verify_key_hint">XXX-XXX-XXX</string>
+    <string name="login_verify_key_err_msg">Wrong verifier code</string>
+    <string name="login_verify_ok">Verify</string>
+</resources>
