@@ -2,10 +2,8 @@ package io.github.cat_in_136.flickrsimpleorganizr
 
 import android.content.Intent
 import android.net.Uri
-import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.preference.Preference
 import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
 import android.text.TextUtils
@@ -17,7 +15,6 @@ import com.github.scribejava.core.model.OAuthRequest
 import com.github.scribejava.core.model.Verb
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.Main
-import org.w3c.dom.Text
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.suspendCoroutine
 
@@ -108,6 +105,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                                     .setOnDismissListener({ continuation.resume(null) })
                                     .show()
                         }
+
+                        val intent = Intent(this@MainActivity, PhotosActivity::class.java)
+                        intent.putExtra(PhotosActivity.EXTRA_FLICKR_ACCESS_TOKEN, accessToken)
+                        startActivity(intent)
                     } catch (e : Exception) {
                         Log.e("Login", "Test Access Error", e)
                     }
