@@ -11,7 +11,6 @@
 
         <EditTextPreference
             android:key="preference_account_oauth_shared_secret"
-            android:password="true"
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="@string/pref_title_account_oauth_shared_secret" />
