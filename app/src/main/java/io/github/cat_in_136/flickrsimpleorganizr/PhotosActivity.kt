@@ -4,12 +4,21 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuthRequest
 import com.github.scribejava.core.model.Verb
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.Main
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserException
+import org.xmlpull.v1.XmlPullParserFactory
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.suspendCoroutine
 
@@ -23,6 +32,12 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_photos)
+
+        findViewById<RecyclerView>(R.id.photo_recycler_view).apply {
+            setHasFixedSize(true)
+            layoutManager = GridLayoutManager(this@PhotosActivity, 5)
+            adapter = PhotoCyclerViewAdapter(arrayOf())
+        }
 
         intent.getSerializableExtra(EXTRA_FLICKR_ACCESS_TOKEN).let {
             if (it is OAuth1AccessToken) {
@@ -65,7 +80,35 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
             request.addQuerystringParameter("user_id", "me")
             val (code, headers, body) = flickrClient!!.access(request).await()
 
+
             Log.d("Photos", "getPhotos ${body}")
+
+            XmlPullParserFactory.newInstance().newPullParser().let {
+                it.setInput(body.reader())
+                try {
+                    val data = mutableListOf<HashMap<String, String>>()
+
+                    var eventType = it.eventType
+                    while (eventType != XmlPullParser.END_DOCUMENT) {
+                        if (eventType == XmlPullParser.START_TAG) {
+                            if (it.name == "photo") {
+                                data += HashMap<String, String>().apply {
+                                    for (i in 0 .. (it.attributeCount - 1)) {
+                                        this[it.getAttributeName(i)] = it.getAttributeValue(i)
+                                    }
+                                }
+                            }
+                        }
+                        eventType = it.next()
+                    }
+
+                    findViewById<RecyclerView>(R.id.photo_recycler_view).apply {
+                        adapter = PhotoCyclerViewAdapter(data.toTypedArray())
+                    }
+                } catch (ex : XmlPullParserException) {
+                    Log.e("Photos", "getPhotos", ex)
+                }
+            }
         } catch (e : Exception) {
             finishByException(e, "Load Photos").await()
         }
@@ -84,6 +127,22 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
         }
 
         this@PhotosActivity.finish()
+    }
+
+    class PhotoCyclerViewAdapter(private val myDataset: Array<HashMap<String, String>>) :
+            RecyclerView.Adapter<PhotoCyclerViewAdapter.ViewHolder>() {
+        class ViewHolder(val view: View) : RecyclerView.ViewHolder(view)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+                ViewHolder(LayoutInflater.from(parent.context)
+                        .inflate(R.layout.photo_cycler_view, parent, false))
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val photo = myDataset[position]
+            holder.view.findViewById<TextView>(R.id.photo_cycler_text_view).text = photo["title"]
+        }
+
+        override fun getItemCount(): Int = myDataset.size
     }
 
     companion object {
