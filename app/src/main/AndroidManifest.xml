@@ -22,7 +22,9 @@
             android:name=".SettingsActivity"
             android:exported="false"
             android:label="@string/title_activity_settings" />
-        <activity android:name=".PhotosActivity"></activity>
+        <activity
+            android:name=".PhotosActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

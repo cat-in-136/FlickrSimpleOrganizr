@@ -12,6 +12,8 @@
         android:id="@+id/photo_grid_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:clipToPadding="false"
         android:columnWidth="90dp"
         android:numColumns="auto_fit"
         android:verticalSpacing="0dp"
