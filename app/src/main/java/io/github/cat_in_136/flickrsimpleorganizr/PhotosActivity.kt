@@ -1,16 +1,20 @@
 package io.github.cat_in_136.flickrsimpleorganizr
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.*
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestOptions
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuthRequest
 import com.github.scribejava.core.model.Verb
@@ -32,12 +36,6 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_photos)
-
-        findViewById<RecyclerView>(R.id.photo_recycler_view).apply {
-            setHasFixedSize(true)
-            layoutManager = GridLayoutManager(this@PhotosActivity, 5)
-            adapter = PhotoCyclerViewAdapter(arrayOf())
-        }
 
         intent.getSerializableExtra(EXTRA_FLICKR_ACCESS_TOKEN).let {
             if (it is OAuth1AccessToken) {
@@ -102,8 +100,8 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
                         eventType = it.next()
                     }
 
-                    findViewById<RecyclerView>(R.id.photo_recycler_view).apply {
-                        adapter = PhotoCyclerViewAdapter(data.toTypedArray())
+                    findViewById<GridView>(R.id.photo_grid_view).apply {
+                        adapter = PhotoGridViewAdapter(data.toTypedArray())
                     }
                 } catch (ex : XmlPullParserException) {
                     Log.e("Photos", "getPhotos", ex)
@@ -129,20 +127,32 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
         this@PhotosActivity.finish()
     }
 
-    class PhotoCyclerViewAdapter(private val myDataset: Array<HashMap<String, String>>) :
-            RecyclerView.Adapter<PhotoCyclerViewAdapter.ViewHolder>() {
-        class ViewHolder(val view: View) : RecyclerView.ViewHolder(view)
+    class PhotoGridViewAdapter(private val dataset: Array<HashMap<String, String>>) : BaseAdapter() {
+        override fun getCount(): Int = dataset.size
+        override fun getItem(position: Int): Any? = dataset[position]
+        override fun getItemId(position: Int): Long = position.toLong()
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val gridItemView = if (convertView == null) {
+                LayoutInflater.from(parent.context)
+                        .inflate(R.layout.photo_gridview, parent, false)
+            } else {
+                convertView
+            }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-                ViewHolder(LayoutInflater.from(parent.context)
-                        .inflate(R.layout.photo_cycler_view, parent, false))
+            val photo = dataset[position]
+            gridItemView.findViewById<TextView>(R.id.photo_gridview_text_view).text = photo["title"]
+            Glide.with(gridItemView)
+                    .load("https://farm1.staticflickr.com/${photo["server"]}/${photo["id"]}_${photo["secret"]}_t.jpg")
+                    .apply(RequestOptions()
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .placeholder(ColorDrawable(Color.LTGRAY))
+                            .error(ColorDrawable(Color.RED))
+                            .centerCrop())
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(gridItemView.findViewById<ImageView>(R.id.photo_gridview_image_view))
 
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val photo = myDataset[position]
-            holder.view.findViewById<TextView>(R.id.photo_cycler_text_view).text = photo["title"]
+            return gridItemView
         }
-
-        override fun getItemCount(): Int = myDataset.size
     }
 
     companion object {
