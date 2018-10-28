@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="flickrBlue">#0063dc</color>
+    <color name="flickrPink">#ff0084</color>
 
     <color name="photoGridViewText">#ffffff</color>
     <color name="photoGridViewTextBackground">#66000000</color>
+
+    <color name="accent_material_light">@color/flickrBlue</color>
+    <color name="accent_material_dark">@color/flickrPink</color>
 </resources>
