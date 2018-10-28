@@ -37,6 +37,15 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
             letValueShownInSummary(findPreference(KEY_OAUTH_API_KEY))
             letValueShownInSummary(findPreference(KEY_OAUTH_SHARED_SECRET))
+
+            findPreference(KEY_LOGOUT).let {
+                it.isEnabled = (retrieveFlickrAccessToken(activity) != null)
+                it.setOnPreferenceClickListener {
+                    clearFlickrAccessToken(activity)
+                    it.isEnabled = false
+                    return@setOnPreferenceClickListener true
+                }
+            }
         }
 
         override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -49,6 +58,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         }
 
         companion object {
+            val KEY_LOGOUT = "preference_account_logout"
             val KEY_OAUTH_API_KEY = "preference_account_oauth_api_key"
             val KEY_OAUTH_SHARED_SECRET = "preference_account_oauth_shared_secret"
         }

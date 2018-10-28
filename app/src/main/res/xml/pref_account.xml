@@ -3,6 +3,10 @@
 
     <PreferenceCategory android:title="@string/pref_category_account_oauth_app">
 
+        <Preference android:key="preference_account_logout"
+            android:enabled="false"
+            android:title="@string/pref_title_account_logout"/>
+
         <EditTextPreference
             android:key="preference_account_oauth_api_key"
             android:selectAllOnFocus="true"

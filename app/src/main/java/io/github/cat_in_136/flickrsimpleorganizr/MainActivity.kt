@@ -1,20 +1,27 @@
 package io.github.cat_in_136.flickrsimpleorganizr
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.security.KeyPairGeneratorSpec
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
 import android.support.v7.app.AlertDialog
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.EditText
 import com.github.scribejava.core.model.OAuth1AccessToken
+import com.github.scribejava.core.model.OAuth1Token
 import com.github.scribejava.core.model.OAuthRequest
 import com.github.scribejava.core.model.Verb
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.Main
+import java.security.KeyPairGenerator
+import java.security.spec.ECGenParameterSpec
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.suspendCoroutine
 
@@ -33,7 +40,18 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         job.cancel()
     }
 
-    fun startLoginToFlickr(view : View) {
+    fun startFlickr(view: View) {
+        val accessToken = retrieveFlickrAccessToken(this)
+        if (accessToken != null) {
+            val intent = Intent(this, PhotosActivity::class.java)
+            intent.putExtra(PhotosActivity.EXTRA_FLICKR_ACCESS_TOKEN, accessToken)
+            startActivity(intent)
+        } else {
+            startLoginToFlickr(view)
+        }
+    }
+
+    private fun startLoginToFlickr(view : View) {
         async {
             val (apiKey, sharedSecret) = PreferenceManager.getDefaultSharedPreferences(this@MainActivity).let {
                 Pair(
@@ -106,9 +124,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                                     .show()
                         }
 
-                        val intent = Intent(this@MainActivity, PhotosActivity::class.java)
-                        intent.putExtra(PhotosActivity.EXTRA_FLICKR_ACCESS_TOKEN, accessToken)
-                        startActivity(intent)
+                        storeFlickrAccessToken(this@MainActivity, accessToken)
+                        startFlickr(view)
                     } catch (e : Exception) {
                         Log.e("Login", "Test Access Error", e)
                     }
