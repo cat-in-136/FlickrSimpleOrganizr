@@ -7,9 +7,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -101,7 +99,7 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
                     }
 
                     findViewById<GridView>(R.id.photo_grid_view).apply {
-                        adapter = PhotoGridViewAdapter(data.toTypedArray())
+                        adapter = PhotoGridViewAdapter(this, data.toTypedArray())
                     }
                 } catch (ex : XmlPullParserException) {
                     Log.e("Photos", "getPhotos", ex)
@@ -127,7 +125,10 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
         this@PhotosActivity.finish()
     }
 
-    class PhotoGridViewAdapter(private val dataset: Array<HashMap<String, String>>) : BaseAdapter() {
+    class PhotoGridViewAdapter(private val gridView: GridView, private val dataset: Array<HashMap<String, String>>) : BaseAdapter() {
+
+        private val mSelection = mutableSetOf<Int>()
+
         override fun getCount(): Int = dataset.size
         override fun getItem(position: Int): Any? = dataset[position]
         override fun getItemId(position: Int): Long = position.toLong()
@@ -137,6 +138,14 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
                         .inflate(R.layout.photo_gridview, parent, false)
             } else {
                 convertView
+            }
+
+            gridItemView.findViewById<CheckBox>(R.id.photo_gridview_check_box).apply {
+                setOnCheckedChangeListener(null)
+                isChecked = isPositionChecked(position)
+                setOnCheckedChangeListener { btn, isChecked ->
+                    setNewSelection(position, isChecked)
+                }
             }
 
             val photo = dataset[position]
@@ -150,8 +159,28 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
                             .centerCrop())
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(gridItemView.findViewById<ImageView>(R.id.photo_gridview_image_view))
+            gridItemView.findViewById<CheckBox>(R.id.photo_gridview_check_box)
+                    .isChecked = isPositionChecked(position)
 
             return gridItemView
+        }
+
+        fun setNewSelection(position: Int, value: Boolean) {
+            if (value) {
+                mSelection.add(position)
+            } else {
+                mSelection.remove(position)
+            }
+            notifyDataSetChanged()
+        }
+
+        fun isPositionChecked(position: Int): Boolean = mSelection.contains(position)
+
+        fun getCheckedItemCount(): Int = mSelection.size
+
+        fun clearSelection() {
+            mSelection.clear()
+            notifyDataSetChanged()
         }
     }
 
