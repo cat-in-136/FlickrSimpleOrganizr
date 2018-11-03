@@ -1,13 +1,16 @@
 package io.github.cat_in_136.flickrsimpleorganizr
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -23,6 +26,7 @@ import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.suspendCoroutine
+
 
 class PhotosActivity : AppCompatActivity(), CoroutineScope {
     internal val job = Job()
@@ -99,7 +103,7 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
                     }
 
                     findViewById<GridView>(R.id.photo_grid_view).apply {
-                        adapter = PhotoGridViewAdapter(this, data.toTypedArray())
+                        adapter = PhotoGridViewAdapter(this@PhotosActivity, data.toTypedArray())
                     }
                 } catch (ex : XmlPullParserException) {
                     Log.e("Photos", "getPhotos", ex)
@@ -125,30 +129,35 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
         this@PhotosActivity.finish()
     }
 
-    class PhotoGridViewAdapter(private val gridView: GridView, private val dataset: Array<HashMap<String, String>>) : BaseAdapter() {
+    private class PhotoGridViewAdapter(context: Context, dataSet: Array<HashMap<String, String>>) : ArrayAdapter<HashMap<String, String>>(context, R.id.photo_grid_view, dataSet) {
 
         private val mSelection = mutableSetOf<Int>()
 
-        override fun getCount(): Int = dataset.size
-        override fun getItem(position: Int): Any? = dataset[position]
-        override fun getItemId(position: Int): Long = position.toLong()
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val gridItemView = if (convertView == null) {
                 LayoutInflater.from(parent.context)
-                        .inflate(R.layout.photo_gridview, parent, false)
-            } else {
-                convertView
-            }
+                        .inflate(R.layout.photo_gridview, parent, false).apply {
+                            findViewById<CheckBox>(R.id.photo_gridview_check_box).apply {
+                                tag = position
+                                isChecked = this@PhotoGridViewAdapter.isPositionChecked(position)
 
-            gridItemView.findViewById<CheckBox>(R.id.photo_gridview_check_box).apply {
-                setOnCheckedChangeListener(null)
-                isChecked = isPositionChecked(position)
-                setOnCheckedChangeListener { btn, isChecked ->
-                    setNewSelection(position, isChecked)
+                                setOnClickListener { view ->
+                                    (tag as? Int)?.let {
+                                        this@PhotoGridViewAdapter.setNewSelection(it, isChecked)
+                                    }
+                                }
+                            }
+                        }
+            } else {
+                convertView.apply {
+                    findViewById<CheckBox>(R.id.photo_gridview_check_box).apply {
+                        tag = position
+                        isChecked = isPositionChecked(position)
+                    }
                 }
             }
 
-            val photo = dataset[position]
+            val photo = getItem(position)
             gridItemView.findViewById<TextView>(R.id.photo_gridview_text_view).text = photo["title"]
             Glide.with(gridItemView)
                     .load("https://farm1.staticflickr.com/${photo["server"]}/${photo["id"]}_${photo["secret"]}_t.jpg")
@@ -159,8 +168,6 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
                             .centerCrop())
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(gridItemView.findViewById<ImageView>(R.id.photo_gridview_image_view))
-            gridItemView.findViewById<CheckBox>(R.id.photo_gridview_check_box)
-                    .isChecked = isPositionChecked(position)
 
             return gridItemView
         }
