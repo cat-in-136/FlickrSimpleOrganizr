@@ -8,9 +8,7 @@ import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -39,6 +37,10 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_photos)
 
+        findViewById<GridView>(R.id.photo_grid_view).apply {
+            registerForContextMenu(this)
+        }
+
         intent.getSerializableExtra(EXTRA_FLICKR_ACCESS_TOKEN).let {
             if (it is OAuth1AccessToken) {
                 val (apiKey, sharedSecret) = PreferenceManager.getDefaultSharedPreferences(this@PhotosActivity).let {
@@ -57,6 +59,20 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
                 checkAccessToken().await()
                 loadPhotos().await()
             }
+        }
+    }
+
+    override fun onCreateContextMenu(menu: ContextMenu, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
+        super.onCreateContextMenu(menu, view, menuInfo)
+        menuInflater.inflate(R.menu.photo_gridview_popup, menu)
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.photo_gridview_popup_item -> {
+                return true
+            }
+            else -> return super.onContextItemSelected(item)
         }
     }
 
@@ -137,6 +153,9 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
             val gridItemView = if (convertView == null) {
                 LayoutInflater.from(parent.context)
                         .inflate(R.layout.photo_gridview, parent, false).apply {
+                            setOnLongClickListener {
+                                return@setOnLongClickListener parent.performLongClick()
+                            }
                             findViewById<CheckBox>(R.id.photo_gridview_check_box).apply {
                                 tag = position
                                 isChecked = this@PhotoGridViewAdapter.isPositionChecked(position)
