@@ -25,7 +25,6 @@ import org.xmlpull.v1.XmlPullParserFactory
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.suspendCoroutine
 
-
 class PhotosActivity : AppCompatActivity(), CoroutineScope {
     internal val job = Job()
     override val coroutineContext: CoroutineContext
@@ -187,6 +186,10 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
                             .centerCrop())
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(gridItemView.findViewById<ImageView>(R.id.photo_gridview_image_view))
+
+            gridItemView.findViewById<ImageView>(R.id.photo_gridview_lockicon).apply {
+                visibility = if (photo["ispublic"] == "1") View.GONE else View.VISIBLE
+            }
 
             return gridItemView
         }
