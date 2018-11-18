@@ -1,6 +1,7 @@
 package io.github.cat_in_136.flickrsimpleorganizr
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -64,11 +65,22 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
     override fun onCreateContextMenu(menu: ContextMenu, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
         super.onCreateContextMenu(menu, view, menuInfo)
         menuInflater.inflate(R.menu.photo_gridview_popup, menu)
+
+        menu.findItem(R.id.photo_gridview_popup_item_add_tags).setVisible(
+                if (photoGridViewAdapter.getCheckedItemCount() > 0) {
+                    true
+                } else {
+                    false
+                })
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.photo_gridview_popup_item -> {
+            R.id.photo_gridview_popup_item_add_tags -> {
+                val intent = Intent(this, PhotoAddTagsActivity::class.java)
+                intent.putExtra(PhotosActivity.EXTRA_FLICKR_ACCESS_TOKEN, flickrClient?.accessToken)
+                intent.putExtra(PhotosActivity.EXTRA_FLICKR_PHOTOS, photoGridViewAdapter.getCheckedItems())
+                startActivity(intent)
                 return true
             }
             else -> return super.onContextItemSelected(item)
@@ -117,9 +129,7 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
                         eventType = it.next()
                     }
 
-                    findViewById<GridView>(R.id.photo_grid_view).apply {
-                        adapter = PhotoGridViewAdapter(this@PhotosActivity, data.toTypedArray())
-                    }
+                    photoGridViewAdapter = PhotoGridViewAdapter(this@PhotosActivity, data.toTypedArray())
                 } catch (ex : XmlPullParserException) {
                     Log.e("Photos", "getPhotos", ex)
                 }
@@ -129,6 +139,12 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
         }
 
     }
+
+    private var photoGridViewAdapter: PhotoGridViewAdapter
+            get() = findViewById<GridView>(R.id.photo_grid_view).adapter as PhotoGridViewAdapter
+            set(value) {
+                findViewById<GridView>(R.id.photo_grid_view).adapter = value
+            }
 
     private suspend fun finishByException(e : Throwable, msg : String) = async {
         Log.e("Photos", msg, e)
@@ -144,7 +160,7 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
         this@PhotosActivity.finish()
     }
 
-    private class PhotoGridViewAdapter(context: Context, dataSet: Array<HashMap<String, String>>) : ArrayAdapter<HashMap<String, String>>(context, R.id.photo_grid_view, dataSet) {
+    private class PhotoGridViewAdapter(context: Context, var dataSet: Array<HashMap<String, String>>) : ArrayAdapter<HashMap<String, String>>(context, R.id.photo_grid_view, dataSet) {
 
         private val mSelection = mutableSetOf<Int>()
 
@@ -207,6 +223,12 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
 
         fun getCheckedItemCount(): Int = mSelection.size
 
+        fun getCheckedItems(): Array<HashMap<String, String>> {
+            return dataSet.filterIndexed {
+                index, _ -> isPositionChecked(index)
+            }.toTypedArray()
+        }
+
         fun clearSelection() {
             mSelection.clear()
             notifyDataSetChanged()
@@ -215,5 +237,6 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
 
     companion object {
         val EXTRA_FLICKR_ACCESS_TOKEN = "io.github.cat_in_136.flickrsimpleorganizr.EXTRA_FLICKR_ACCESS_TOKEN"
+        val EXTRA_FLICKR_PHOTOS = "io.github.cat_in_136.flickrsimpleorganizr.EXTRA_FLICKR_PHOTOS"
     }
 }

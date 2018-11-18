@@ -2,5 +2,7 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Item" android:id="@+id/photo_gridview_popup_item" />
+    <item
+        android:id="@+id/photo_gridview_popup_item_add_tags"
+        android:title="@string/photo_add_tags" />
 </menu>

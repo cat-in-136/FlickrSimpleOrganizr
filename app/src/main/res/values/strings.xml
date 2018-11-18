@@ -15,7 +15,9 @@
     <string name="pref_title_account_oauth_api_key">Key</string>
     <string name="pref_title_account_oauth_shared_secret">Secret</string>
     <string name="pref_title_account_logout">Logout</string>
-
     <!-- Strings related to Settings -->
+
+    <string name="photo_add_tags">Add Tags</string>
+    <string name="photo_add_tags_tags_to_add">Tags to Add</string>
 
 </resources>
