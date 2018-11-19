@@ -1,16 +1,21 @@
 package io.github.cat_in_136.flickrsimpleorganizr
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.view.View
-import android.util.Log
+import android.widget.EditText
 import com.github.scribejava.core.model.OAuth1AccessToken
+import com.github.scribejava.core.model.OAuthRequest
+import com.github.scribejava.core.model.Verb
 import kotlinx.coroutines.experimental.CoroutineScope
 import kotlinx.coroutines.experimental.Dispatchers
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.Main
+import kotlinx.coroutines.experimental.async
 import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.experimental.suspendCoroutine
 
 class PhotoAddTagsActivity : AppCompatActivity(), CoroutineScope {
     internal val job = Job()
@@ -39,12 +44,53 @@ class PhotoAddTagsActivity : AppCompatActivity(), CoroutineScope {
         }
         intent.getSerializableExtra(PhotosActivity.EXTRA_FLICKR_PHOTOS).let {
             photos = it as Array<HashMap<String, String>>
-            Log.d("PhotoAddTagsActivity", "${photos}")
         }
     }
 
     fun onAddTags(view: View) {
-        Log.d("onAddTags", "${photos}")
-        // TODO Impl
+        val tags = findViewById<EditText>(R.id.photo_add_tags_text_edit).text.toString()
+                .replace("\\n".toRegex(), " ").trim()
+
+        assert(photos != null)
+
+        async {
+            val ret = photos!!.map {
+                val request = OAuthRequest(Verb.GET, "https://api.flickr.com/services/rest/")
+                request.addQuerystringParameter("method", "flickr.photos.addTags");
+                request.addQuerystringParameter("photo_id", it["id"])
+                request.addQuerystringParameter("tags", tags)
+                val (code, headers, body) = flickrClient!!.access(request).await()
+
+                return@map Pair(code, body);
+            }
+
+            if (ret!!.any { return@any it.first != 200 }) {
+                suspendCoroutine<Nothing?> { continuation ->
+                    val errorSummay = photos!!.mapIndexed { index, photo ->
+                        if (ret!![index].first != 200) {
+                            "${photo["title"]} ${photo["id"]} : NG"
+                        } else {
+                            null
+                        }
+                    }.filterNotNull().joinToString("\n")
+
+                    AlertDialog.Builder(this@PhotoAddTagsActivity)
+                            .setTitle(android.R.string.dialog_alert_title)
+                            .setMessage(getResources().getString(R.string.photo_add_tags_failed_msg) + "\n\n" + errorSummay)
+                            .setPositiveButton(android.R.string.ok, null)
+                            .setOnDismissListener({ continuation.resume(null) })
+                            .show()
+                }
+            } else {
+                suspendCoroutine<Nothing?> { continuation ->
+                    AlertDialog.Builder(this@PhotoAddTagsActivity)
+                            .setMessage(R.string.photo_add_tags_success_msg)
+                            .setPositiveButton(android.R.string.ok, null)
+                            .setOnDismissListener({ continuation.resume(null) })
+                            .show()
+                }
+                this@PhotoAddTagsActivity.finish()
+            }
+        }
     }
 }

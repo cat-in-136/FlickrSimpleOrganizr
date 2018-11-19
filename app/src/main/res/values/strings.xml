@@ -19,5 +19,7 @@
 
     <string name="photo_add_tags">Add Tags</string>
     <string name="photo_add_tags_tags_to_add">Tags to Add</string>
+    <string name="photo_add_tags_failed_msg">Failed to add tags</string>
+    <string name="photo_add_tags_success_msg">Successfully completed</string>
 
 </resources>
