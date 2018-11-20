@@ -1,0 +1,28 @@
+language: android
+jdk: openjdk8
+sudo: false
+android:
+  components:
+  - tools
+  - platform-tools
+  - build-tools-28.0.3
+  - android-27
+  - sys-img-armeabi-v7a-android-27
+  - extra-android-m2repository
+before_script:
+- echo no | android create avd --force -n test -t android-27 --abi armeabi-v7a
+- emulator -avd test -no-skin -no-audio -no-window &
+- android-wait-for-emulator
+- adb shell input keyevent 82 &
+script: "./gradlew connectedAndroidTest"
+before_cache:
+- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+notifications:
+  email: false
+  slack:
+    secure: LOSr/bPVtEvtU8w/4nlsb1nVak2Xz4Gj3YsVcBVl6q0ImqVrfAu6KTsihjmBJ1UHB8DJHG70Ew//CtFC1VMw9u/8pSqpdNdZP8Os1VKxXZO/N4tCfXdVPFtb8BWSwla2lzP2eveEASAR63ZjEPApmuN/ne4fnOWNPSeFVGhWPq67trpt+4v64kKyNt0NcAeOSYpKrxLlC62uUqaq9n8ud+Ek1bS/gGb61zN5+vKSFYKQFnPZwdxNaikEO8YNR8JxPYAkNI20CU/TiCnRHkyuvtgMqrD/fg1hgvKDnf4INcUij4bRZmsLat6d0flG4COnMklDoGJY4Esh83IYY0vSdj2rhvw21GKX8yS40lvIvsXbjNRWFleBh0KRLbqvD7XnD0sptebMa3QeOVPb1vdq3/LgeK4UM6QEKm3Wp6t8nNoSwQ/m+vzyuqhxzCaGBJz96JoWixzriw5+xIgNOYWwiEoOfy8vHq3D2DwvPg3zSc8uCfrZuZGhjTG2yW4w9OsvlrHGVBuxkg/a5vXAx5D52nmNnKlQDAlk4cEA9LLkkVncfJv23GYiSSctocS837QvHB/cx6koYLVq/M6rtwUkujTayBUDZVcyrzuR1kBZNYXdHzT+wa9G9b1dmy2AuHPDISUkj/dzOQVsfsER0Iq9c4wc1z6e/v9PT1aE156pN/0=
