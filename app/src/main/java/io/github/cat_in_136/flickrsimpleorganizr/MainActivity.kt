@@ -56,13 +56,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 )
             }
             if (TextUtils.isEmpty(apiKey) || TextUtils.isEmpty(sharedSecret)) {
-                suspendCoroutine<Nothing?> { continuation ->
-                    AlertDialog.Builder(this@MainActivity)
-                            .setMessage(R.string.login_oauth_setting_missing_err_msg)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .setOnDismissListener({ continuation.resume(null) })
-                            .show()
-                }
+                alert(this@MainActivity, R.string.login_oauth_setting_missing_err_msg);
                 launch { startSettingActivity(view) }
                 return@async
             }
@@ -112,28 +106,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                         testRequest.addQuerystringParameter("method", "flickr.test.login");
                         val (code, headers, body) = flickrClient.access(testRequest).await()
 
-                        suspendCoroutine<Nothing?> { continuation ->
-                            AlertDialog.Builder(this@MainActivity)
-                                    .setMessage(body)
-                                    .setPositiveButton(android.R.string.ok, null)
-                                    .setOnDismissListener({ continuation.resume(null) })
-                                    .show()
-                        }
-
                         storeFlickrAccessToken(this@MainActivity, accessToken)
                         startFlickr(view)
                     } catch (e : Exception) {
                         Log.e("Login", "Test Access Error", e)
                     }
                 } else {
-                    suspendCoroutine<Nothing?> { continuation ->
-                        AlertDialog.Builder(this@MainActivity)
-                                .setTitle(android.R.string.dialog_alert_title)
-                                .setMessage(R.string.login_verify_key_err_msg)
-                                .setPositiveButton(android.R.string.ok, null)
-                                .setOnDismissListener({ continuation.resume(null) })
-                                .show()
-                    }
+                    alert(this@MainActivity, R.string.login_verify_key_err_msg, android.R.string.dialog_alert_title)
                 }
             }
         }

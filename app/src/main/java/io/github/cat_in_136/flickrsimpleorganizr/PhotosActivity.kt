@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.*
@@ -24,7 +23,6 @@ import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
 import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.suspendCoroutine
 
 class PhotosActivity : AppCompatActivity(), CoroutineScope {
     internal val job = Job()
@@ -78,8 +76,8 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
         when (item.itemId) {
             R.id.photo_gridview_popup_item_add_tags -> {
                 val intent = Intent(this, PhotoAddTagsActivity::class.java)
-                intent.putExtra(PhotosActivity.EXTRA_FLICKR_ACCESS_TOKEN, flickrClient?.accessToken)
-                intent.putExtra(PhotosActivity.EXTRA_FLICKR_PHOTOS, photoGridViewAdapter.getCheckedItems())
+                intent.putExtra(EXTRA_FLICKR_ACCESS_TOKEN, flickrClient?.accessToken)
+                intent.putExtra(EXTRA_FLICKR_PHOTOS, photoGridViewAdapter.getCheckedItems())
                 startActivity(intent)
                 return true
             }
@@ -149,13 +147,7 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
     private suspend fun finishByException(e : Throwable, msg : String) = async {
         Log.e("Photos", msg, e)
 
-        suspendCoroutine<Nothing?> { continuation ->
-            AlertDialog.Builder(this@PhotosActivity)
-                    .setMessage("Test Access Error")
-                    .setPositiveButton(android.R.string.ok, null)
-                    .setOnDismissListener({ continuation.resume(null) })
-                    .show()
-        }
+        alert(this@PhotosActivity, R.string.test_access_error, android.R.string.dialog_alert_title)
 
         this@PhotosActivity.finish()
     }

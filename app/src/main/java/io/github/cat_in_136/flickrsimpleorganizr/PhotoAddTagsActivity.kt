@@ -15,7 +15,6 @@ import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.Main
 import kotlinx.coroutines.experimental.async
 import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.suspendCoroutine
 
 class PhotoAddTagsActivity : AppCompatActivity(), CoroutineScope {
     internal val job = Job()
@@ -65,30 +64,19 @@ class PhotoAddTagsActivity : AppCompatActivity(), CoroutineScope {
             }
 
             if (ret!!.any { return@any it.first != 200 }) {
-                suspendCoroutine<Nothing?> { continuation ->
-                    val errorSummay = photos!!.mapIndexed { index, photo ->
-                        if (ret!![index].first != 200) {
-                            "${photo["title"]} ${photo["id"]} : NG"
-                        } else {
-                            null
-                        }
-                    }.filterNotNull().joinToString("\n")
+                val errorSummay = photos!!.mapIndexed { index, photo ->
+                    if (ret!![index].first != 200) {
+                        "${photo["title"]} ${photo["id"]} : NG"
+                    } else {
+                        null
+                    }
+                }.filterNotNull().joinToString("\n")
 
-                    AlertDialog.Builder(this@PhotoAddTagsActivity)
-                            .setTitle(android.R.string.dialog_alert_title)
-                            .setMessage(getResources().getString(R.string.photo_add_tags_failed_msg) + "\n\n" + errorSummay)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .setOnDismissListener({ continuation.resume(null) })
-                            .show()
-                }
+                alert(this@PhotoAddTagsActivity,
+                        getResources().getString(R.string.photo_add_tags_failed_msg) + "\n\n" + errorSummay,
+                        this@PhotoAddTagsActivity.getString(android.R.string.dialog_alert_title))
             } else {
-                suspendCoroutine<Nothing?> { continuation ->
-                    AlertDialog.Builder(this@PhotoAddTagsActivity)
-                            .setMessage(R.string.photo_add_tags_success_msg)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .setOnDismissListener({ continuation.resume(null) })
-                            .show()
-                }
+                alert(this@PhotoAddTagsActivity, R.string.photo_add_tags_success_msg)
                 this@PhotoAddTagsActivity.finish()
             }
         }
