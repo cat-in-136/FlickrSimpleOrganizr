@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatDelegate
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuthRequest
@@ -49,6 +50,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
     private fun startLoginToFlickr(view : View) {
         async {
+            findViewById<Button>(R.id.login_button).isEnabled = false
+
             val (apiKey, sharedSecret) = PreferenceManager.getDefaultSharedPreferences(this@MainActivity).let {
                 Pair(
                     it.getString(SettingsActivity.AccountPreferenceFragment.KEY_OAUTH_API_KEY, ""),
@@ -58,6 +61,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             if (TextUtils.isEmpty(apiKey) || TextUtils.isEmpty(sharedSecret)) {
                 alert(this@MainActivity, R.string.login_oauth_setting_missing_err_msg);
                 launch { startSettingActivity(view) }
+                findViewById<Button>(R.id.login_button).isEnabled = true
                 return@async
             }
             val flickrClient = FlickrClient(apiKey, sharedSecret, job)
@@ -90,6 +94,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 }
 
                 if (TextUtils.isEmpty(verifyCode)) {
+                    findViewById<Button>(R.id.login_button).isEnabled = true
                     return@async
                 } else {
                     try {
@@ -116,6 +121,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 }
             }
         }
+
+        findViewById<Button>(R.id.login_button).isEnabled = true
     }
 
     fun startSettingActivity(view: View) {

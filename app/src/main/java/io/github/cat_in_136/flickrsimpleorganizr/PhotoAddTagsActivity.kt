@@ -5,6 +5,7 @@ import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuthRequest
@@ -47,6 +48,8 @@ class PhotoAddTagsActivity : AppCompatActivity(), CoroutineScope {
     }
 
     fun onAddTags(view: View) {
+        findViewById<Button>(R.id.photo_add_tags).isEnabled = false
+
         val tags = findViewById<EditText>(R.id.photo_add_tags_text_edit).text.toString()
                 .replace("\\n".toRegex(), " ").trim()
 
@@ -77,8 +80,10 @@ class PhotoAddTagsActivity : AppCompatActivity(), CoroutineScope {
                         this@PhotoAddTagsActivity.getString(android.R.string.dialog_alert_title))
             } else {
                 alert(this@PhotoAddTagsActivity, R.string.photo_add_tags_success_msg)
+                findViewById<Button>(R.id.photo_add_tags).isEnabled = true
                 this@PhotoAddTagsActivity.finish()
             }
+            findViewById<Button>(R.id.photo_add_tags).isEnabled = true
         }
     }
 }
