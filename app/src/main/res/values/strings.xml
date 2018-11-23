@@ -23,5 +23,17 @@
     <string name="photo_add_tags_tags_to_add">Tags to Add</string>
     <string name="photo_add_tags_failed_msg">Failed to add tags</string>
     <string name="photo_add_tags_success_msg">Successfully completed</string>
+    <string name="edit_dates">Edit dates</string>
+    <string name="date_taken">Date Taken</string>
+    <string name="edit_dates_change_dates">Change Dates</string>
+    <string name="change_dates_failed_msg">Failed to change dates</string>
+    <string name="change_dates_success_msg">Successfully completed</string>
+    <string name="date_taken_granularity">Granularity of date token</string>
+    <string-array name="date_taken_granularity_values">
+        <item>Y-m-d H:i:s</item>
+        <item>Y-m</item>
+        <item>Y</item>
+        <item>Circa...</item>
+    </string-array>
 
 </resources>

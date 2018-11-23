@@ -25,7 +25,8 @@
         <activity
             android:name=".PhotosActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".PhotoAddTagsActivity"></activity>
+        <activity android:name=".PhotoAddTagsActivity" />
+        <activity android:name=".EditDateActivity"></activity>
     </application>
 
 </manifest>

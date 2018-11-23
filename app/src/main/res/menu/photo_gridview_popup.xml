@@ -5,4 +5,7 @@
     <item
         android:id="@+id/photo_gridview_popup_item_add_tags"
         android:title="@string/photo_add_tags" />
+    <item
+        android:id="@+id/photo_gridview_popup_item_edit_dates"
+        android:title="@string/edit_dates" />
 </menu>
