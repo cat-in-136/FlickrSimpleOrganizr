@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.support.annotation.IdRes
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -41,65 +42,13 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_date)
 
-        findViewById<CheckBox>(R.id.date_posted_checkbox).setOnCheckedChangeListener { _, _ -> updateDateTimeFields() }
-        findViewById<EditText>(R.id.date_posted_date).setOnClickListener {
-            DatePickerDialog(this@EditDateActivity,
-                    DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
-                        datePostedCalendar.set(Calendar.YEAR, year)
-                        datePostedCalendar.set(Calendar.MONTH, monthOfYear)
-                        datePostedCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                        updateDateTimeFields()
-                    }, datePostedCalendar.get(Calendar.YEAR),
-                    datePostedCalendar.get(Calendar.MONTH),
-                    datePostedCalendar.get(Calendar.DAY_OF_MONTH)).show()
-        }
-        findViewById<EditText>(R.id.date_posted_time).setOnClickListener {
-            MyTimePickerDialog(this@EditDateActivity, MyTimePickerDialog.OnTimeSetListener { view, hourOfDay, minute, seconds->
-                datePostedCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                datePostedCalendar.set(Calendar.MINUTE, minute)
-                datePostedCalendar.set(Calendar.SECOND, seconds)
-                updateDateTimeFields()
-            }, datePostedCalendar.get(Calendar.HOUR_OF_DAY),
-                    datePostedCalendar.get(Calendar.MINUTE),
-                    datePostedCalendar.get(Calendar.SECOND),
-                    true).show()
-        }
-
-        findViewById<CheckBox>(R.id.date_taken_checkbox).setOnCheckedChangeListener { _, _ -> updateDateTimeFields() }
-        findViewById<EditText>(R.id.date_taken_date).setOnClickListener {
-            DatePickerDialog(this@EditDateActivity,
-                    DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
-                        dateDakenCalender.set(Calendar.YEAR, year)
-                        dateDakenCalender.set(Calendar.MONTH, monthOfYear)
-                        dateDakenCalender.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                        updateDateTimeFields()
-            }, dateDakenCalender.get(Calendar.YEAR),
-                    dateDakenCalender.get(Calendar.MONTH),
-                    dateDakenCalender.get(Calendar.DAY_OF_MONTH)).show()
-        }
-        findViewById<EditText>(R.id.date_taken_time).setOnClickListener {
-            MyTimePickerDialog(this@EditDateActivity, MyTimePickerDialog.OnTimeSetListener { view, hourOfDay, minute, seconds->
-                dateDakenCalender.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                dateDakenCalender.set(Calendar.MINUTE, minute)
-                dateDakenCalender.set(Calendar.SECOND, seconds)
-                updateDateTimeFields()
-            }, dateDakenCalender.get(Calendar.HOUR_OF_DAY),
-                    dateDakenCalender.get(Calendar.MINUTE),
-                    dateDakenCalender.get(Calendar.SECOND),
-                    true).show()
-        }
+        initDateTimeFields(datePostedCalendar, R.id.date_posted_checkbox, R.id.date_posted_date, R.id.date_posted_time)
+        initDateTimeFields(dateDakenCalender, R.id.date_taken_checkbox, R.id.date_taken_date, R.id.date_taken_time)
         findViewById<Spinner>(R.id.date_taken_granularity_spinner).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
             override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
-                val (isEnabledForDate, isEnabledForTime) = when (pos) {
-                    DATE_GRANULARITY_SPINNER_POS_MONTH -> Pair(true, false)
-                    DATE_GRANULARITY_SPINNER_POS_YEAR -> Pair(true, false)
-                    DATE_GRANULARITY_SPINNER_POS_CIRCA -> Pair(false, false)
-                    else -> Pair(true, true)
-                }
-                findViewById<EditText>(R.id.date_taken_date).isEnabled = isEnabledForDate
-                findViewById<EditText>(R.id.date_taken_time).isEnabled = isEnabledForTime
+                updateDateTimeFields()
             }
         }
 
@@ -119,10 +68,35 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
             photos = it as Array<HashMap<String, String>>
         }
 
-        photos?.first().let {
-            retrieveDatesFromPhoto(it!!)
-        }
+        retrieveDatesFromPhoto(photos?.first()!!)
         updateDateTimeFields()
+    }
+
+    private fun initDateTimeFields(calendar: Calendar, @IdRes checkboxId: Int, @IdRes dateEditTextId: Int, @IdRes timeEditTextId: Int) {
+        findViewById<CheckBox>(checkboxId).setOnCheckedChangeListener { _, _ -> updateDateTimeFields() }
+        findViewById<EditText>(dateEditTextId).setOnClickListener {
+            DatePickerDialog(this@EditDateActivity,
+                    DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+                        calendar.set(Calendar.YEAR, year)
+                        calendar.set(Calendar.MONTH, monthOfYear)
+                        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                        updateDateTimeFields()
+                    }, calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)).show()
+        }
+        findViewById<EditText>(timeEditTextId).setOnClickListener {
+            MyTimePickerDialog(this@EditDateActivity,
+                    MyTimePickerDialog.OnTimeSetListener { view, hourOfDay, minute, seconds ->
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                        calendar.set(Calendar.MINUTE, minute)
+                        calendar.set(Calendar.SECOND, seconds)
+                        updateDateTimeFields()
+                    }, calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
+                    calendar.get(Calendar.SECOND),
+                    true).show()
+        }
     }
 
     fun onChangeDates(view: View) {
@@ -219,8 +193,16 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
                 .setText("%1\$tT".format(datePostedCalendar), TextView.BufferType.NORMAL)
 
         findViewById<CheckBox>(R.id.date_taken_checkbox).isChecked.let { checked ->
-            findViewById<EditText>(R.id.date_taken_date).isEnabled = checked
-            findViewById<EditText>(R.id.date_taken_time).isEnabled = checked
+            val granularityPos = findViewById<Spinner>(R.id.date_taken_granularity_spinner).selectedItemPosition
+            val (isEnabledForDate, isEnabledForTime) = when (granularityPos) {
+                DATE_GRANULARITY_SPINNER_POS_MONTH -> Pair(checked, false)
+                DATE_GRANULARITY_SPINNER_POS_YEAR -> Pair(checked, false)
+                DATE_GRANULARITY_SPINNER_POS_CIRCA -> Pair(false, false)
+                else -> Pair(checked, checked)
+            }
+
+            findViewById<EditText>(R.id.date_taken_date).isEnabled = isEnabledForDate
+            findViewById<EditText>(R.id.date_taken_time).isEnabled = isEnabledForTime
             findViewById<Spinner>(R.id.date_taken_granularity_spinner).isEnabled = checked
         }
         findViewById<EditText>(R.id.date_taken_date)
