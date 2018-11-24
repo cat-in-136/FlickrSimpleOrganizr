@@ -64,18 +64,23 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
         super.onCreateContextMenu(menu, view, menuInfo)
         menuInflater.inflate(R.menu.photo_gridview_popup, menu)
 
-        menu.findItem(R.id.photo_gridview_popup_item_add_tags).setVisible(
-                if (photoGridViewAdapter.getCheckedItemCount() > 0) {
-                    true
-                } else {
-                    false
-                })
+        val isAnySelected = photoGridViewAdapter.getCheckedItemCount() > 0
+
+        menu.findItem(R.id.photo_gridview_popup_item_add_tags).setVisible(isAnySelected)
+        menu.findItem(R.id.photo_gridview_popup_item_edit_dates).setVisible(isAnySelected)
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.photo_gridview_popup_item_add_tags -> {
                 val intent = Intent(this, PhotoAddTagsActivity::class.java)
+                intent.putExtra(EXTRA_FLICKR_ACCESS_TOKEN, flickrClient?.accessToken)
+                intent.putExtra(EXTRA_FLICKR_PHOTOS, photoGridViewAdapter.getCheckedItems())
+                startActivity(intent)
+                return true
+            }
+            R.id.photo_gridview_popup_item_edit_dates -> {
+                val intent = Intent(this, EditDateActivity::class.java)
                 intent.putExtra(EXTRA_FLICKR_ACCESS_TOKEN, flickrClient?.accessToken)
                 intent.putExtra(EXTRA_FLICKR_PHOTOS, photoGridViewAdapter.getCheckedItems())
                 startActivity(intent)

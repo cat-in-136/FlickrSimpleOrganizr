@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="bottom"
+    tools:context=".EditDateActivity">
+
+    <CheckBox
+        android:id="@+id/date_posted_checkbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:text="@string/photo_posted"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+
+    <EditText
+        android:id="@+id/date_posted_date"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="false"
+        android:inputType="date"
+        android:singleLine="true"
+        android:textAlignment="center" />
+
+    <EditText
+        android:id="@+id/date_posted_time"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="false"
+        android:inputType="time"
+        android:singleLine="true"
+        android:textAlignment="center" />
+
+    <CheckBox
+        android:id="@+id/date_taken_checkbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="@string/date_taken"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+
+    <EditText
+        android:id="@+id/date_taken_date"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="false"
+        android:inputType="date"
+        android:singleLine="true"
+        android:textAlignment="center" />
+
+    <EditText
+        android:id="@+id/date_taken_time"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="false"
+        android:inputType="time"
+        android:singleLine="true"
+        android:textAlignment="center" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:labelFor="@+id/date_taken_granularity_spinner"
+        android:text="@string/date_taken_granularity"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+
+    <Spinner
+        android:id="@+id/date_taken_granularity_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/date_taken_granularity_values" />
+
+    <Button
+        android:id="@+id/change_dates_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onChangeDates"
+        android:text="@string/edit_dates_change_dates" />
+
+</LinearLayout>
