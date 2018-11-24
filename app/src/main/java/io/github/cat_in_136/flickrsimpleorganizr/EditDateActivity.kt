@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Spinner
+import android.widget.*
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuthRequest
 import com.github.scribejava.core.model.Verb
@@ -18,7 +16,6 @@ import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.Main
 import kotlinx.coroutines.experimental.async
 import kotlin.coroutines.experimental.CoroutineContext
-import android.widget.TextView
 import com.ikovac.timepickerwithseconds.MyTimePickerDialog
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
@@ -63,6 +60,20 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
                     dateDakenCalender.get(Calendar.MINUTE),
                     dateDakenCalender.get(Calendar.SECOND),
                     true).show()
+        }
+        findViewById<Spinner>(R.id.date_taken_granularity_spinner).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>) {
+            }
+            override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
+                val (isEnabledForDate, isEnabledForTime) = when (pos) {
+                    DATE_GRANULARITY_SPINNER_POS_MONTH -> Pair(true, false)
+                    DATE_GRANULARITY_SPINNER_POS_YEAR -> Pair(true, false)
+                    DATE_GRANULARITY_SPINNER_POS_CIRCA -> Pair(false, false)
+                    else -> Pair(true, true)
+                }
+                findViewById<EditText>(R.id.date_taken_date).isEnabled = isEnabledForDate
+                findViewById<EditText>(R.id.date_taken_time).isEnabled = isEnabledForTime
+            }
         }
 
         intent.getSerializableExtra(PhotosActivity.EXTRA_FLICKR_ACCESS_TOKEN).let {
