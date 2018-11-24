@@ -24,6 +24,7 @@
     <string name="photo_add_tags_failed_msg">Failed to add tags</string>
     <string name="photo_add_tags_success_msg">Successfully completed</string>
     <string name="edit_dates">Edit dates</string>
+    <string name="photo_posted">Date posted</string>
     <string name="date_taken">Date Taken</string>
     <string name="edit_dates_change_dates">Change Dates</string>
     <string name="change_dates_failed_msg">Failed to change dates</string>
