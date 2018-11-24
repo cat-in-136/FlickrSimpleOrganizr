@@ -1,8 +1,6 @@
 package io.github.cat_in_136.flickrsimpleorganizr
 
-import android.app.AlertDialog
 import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -21,6 +19,7 @@ import kotlinx.coroutines.experimental.android.Main
 import kotlinx.coroutines.experimental.async
 import kotlin.coroutines.experimental.CoroutineContext
 import android.widget.TextView
+import com.ikovac.timepickerwithseconds.MyTimePickerDialog
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
@@ -44,7 +43,6 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
         setContentView(R.layout.activity_edit_date)
 
         findViewById<EditText>(R.id.date_taken_date).setOnClickListener {
-            val calendar = Calendar.getInstance()
             DatePickerDialog(this@EditDateActivity,
                     DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
                         dateDakenCalender.set(Calendar.YEAR, year)
@@ -56,14 +54,15 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
                     dateDakenCalender.get(Calendar.DAY_OF_MONTH)).show()
         }
         findViewById<EditText>(R.id.date_taken_time).setOnClickListener {
-            val calendar = Calendar.getInstance()
-            TimePickerDialog(this@EditDateActivity, TimePickerDialog.OnTimeSetListener { view, hour_of_day, minute ->
-                dateDakenCalender.set(Calendar.HOUR_OF_DAY, hour_of_day)
+            MyTimePickerDialog(this@EditDateActivity, MyTimePickerDialog.OnTimeSetListener { view, hourOfDay, minute, seconds->
+                dateDakenCalender.set(Calendar.HOUR_OF_DAY, hourOfDay)
                 dateDakenCalender.set(Calendar.MINUTE, minute)
-                dateDakenCalender.set(Calendar.SECOND, 0)
+                dateDakenCalender.set(Calendar.SECOND, seconds)
                 updateDateTimeFields()
             }, dateDakenCalender.get(Calendar.HOUR_OF_DAY),
-                    dateDakenCalender.get(Calendar.MINUTE), true).show()
+                    dateDakenCalender.get(Calendar.MINUTE),
+                    dateDakenCalender.get(Calendar.SECOND),
+                    true).show()
         }
 
         intent.getSerializableExtra(PhotosActivity.EXTRA_FLICKR_ACCESS_TOKEN).let {
