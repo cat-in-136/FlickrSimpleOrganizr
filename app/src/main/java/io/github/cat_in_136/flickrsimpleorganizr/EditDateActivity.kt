@@ -193,15 +193,15 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
     }
 
     companion object {
-        private val DATE_GRANULARITY_TIME = 0
-        private val DATE_GRANULARITY_MONTH = 4
-        private val DATE_GRANULARITY_YEAR = 6
-        private val DATE_GRANULARITY_CIRCA = 8
+        private const val DATE_GRANULARITY_TIME = 0
+        private const val DATE_GRANULARITY_MONTH = 4
+        private const val DATE_GRANULARITY_YEAR = 6
+        private const val DATE_GRANULARITY_CIRCA = 8
 
-        private val DATE_GRANULARITY_SPINNER_POS_TIME = 0
-        private val DATE_GRANULARITY_SPINNER_POS_MONTH = 1
-        private val DATE_GRANULARITY_SPINNER_POS_YEAR = 2
-        private val DATE_GRANULARITY_SPINNER_POS_CIRCA = 3
+        private const val DATE_GRANULARITY_SPINNER_POS_TIME = 0
+        private const val DATE_GRANULARITY_SPINNER_POS_MONTH = 1
+        private const val DATE_GRANULARITY_SPINNER_POS_YEAR = 2
+        private const val DATE_GRANULARITY_SPINNER_POS_CIRCA = 3
 
         private val DATE_GRANULARITY_SPINNER_POS_TO_VALUE = arrayOf(
                 DATE_GRANULARITY_TIME, DATE_GRANULARITY_MONTH, DATE_GRANULARITY_YEAR, DATE_GRANULARITY_CIRCA)
