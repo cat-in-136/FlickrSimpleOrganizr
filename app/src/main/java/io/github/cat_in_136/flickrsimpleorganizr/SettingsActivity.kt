@@ -57,8 +57,8 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
         companion object {
             const val KEY_LOGOUT = "preference_account_logout"
-            val KEY_OAUTH_API_KEY = "preference_account_oauth_api_key"
-            val KEY_OAUTH_SHARED_SECRET = "preference_account_oauth_shared_secret"
+            const val KEY_OAUTH_API_KEY = "preference_account_oauth_api_key"
+            const val KEY_OAUTH_SHARED_SECRET = "preference_account_oauth_shared_secret"
         }
     }
 }

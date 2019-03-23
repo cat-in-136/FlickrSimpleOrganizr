@@ -34,7 +34,7 @@
         <item>Y-m-d H:i:s</item>
         <item>Y-m</item>
         <item>Y</item>
-        <item>Circa...</item>
+        <item>Circa…</item>
     </string-array>
     <string name="photo_set_license_info">Set License Info</string>
     <string name="photo_set_license_failed_msg">Failed to change license</string>

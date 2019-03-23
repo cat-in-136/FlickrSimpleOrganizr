@@ -33,14 +33,14 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
 
     private val datePostedCalendar = Calendar.getInstance()
 
-    private val dateDakenCalender = Calendar.getInstance()
+    private val dateTakenCalender = Calendar.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_date)
 
         initDateTimeFields(datePostedCalendar, R.id.date_posted_checkbox, R.id.date_posted_date, R.id.date_posted_time)
-        initDateTimeFields(dateDakenCalender, R.id.date_taken_checkbox, R.id.date_taken_date, R.id.date_taken_time)
+        initDateTimeFields(dateTakenCalender, R.id.date_taken_checkbox, R.id.date_taken_date, R.id.date_taken_time)
         findViewById<Spinner>(R.id.date_taken_granularity_spinner).onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
@@ -99,9 +99,9 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
     fun onChangeDates(view: View) {
         findViewById<Button>(R.id.change_dates_button).isEnabled = false
 
-        val date_posted = datePostedCalendar.time.time / 1000
-        val date_taken = "%1\$tF %1\$tT".format(dateDakenCalender)
-        val date_taken_granularity = DATE_GRANULARITY_SPINNER_POS_TO_VALUE[findViewById<Spinner>(R.id.date_taken_granularity_spinner).selectedItemPosition]
+        val datePosted = datePostedCalendar.time.time / 1000
+        val dateTaken = "%1\$tF %1\$tT".format(dateTakenCalender)
+        val dateTakenGranularity = DATE_GRANULARITY_SPINNER_POS_TO_VALUE[findViewById<Spinner>(R.id.date_taken_granularity_spinner).selectedItemPosition]
 
         assert(photos != null)
 
@@ -110,16 +110,16 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
                 val request = OAuthRequest(Verb.GET, "https://api.flickr.com/services/rest/")
                 request.addQuerystringParameter("method", "flickr.photos.setDates")
                 request.addQuerystringParameter("photo_id", it["id"])
-                request.addQuerystringParameter("date_posted", date_posted.toString(10))
-                request.addQuerystringParameter("date_taken", date_taken)
-                request.addQuerystringParameter("date_taken_granularity", date_taken_granularity.toString(10))
+                request.addQuerystringParameter("date_posted", datePosted.toString(10))
+                request.addQuerystringParameter("date_taken", dateTaken)
+                request.addQuerystringParameter("date_taken_granularity", dateTakenGranularity.toString(10))
                 val (code, _, body) = flickrClient!!.access(request).await()
 
                 return@map Pair(code, body)
             }
 
             if (ret.any { return@any it.first != 200 }) {
-                val errorSummay = photos!!.mapIndexed { index, photo ->
+                val errorSummary = photos!!.mapIndexed { index, photo ->
                     if (ret[index].first != 200) {
                         "${photo["title"]} ${photo["id"]} : NG"
                     } else {
@@ -128,7 +128,7 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
                 }.filterNotNull().joinToString("\n")
 
                 alert(this@EditDateActivity,
-                        getResources().getString(R.string.change_dates_failed_msg) + "\n\n" + errorSummay,
+                        resources.getString(R.string.change_dates_failed_msg) + "\n\n" + errorSummary,
                         this@EditDateActivity.getString(android.R.string.dialog_alert_title))
             } else {
                 alert(this@EditDateActivity, R.string.change_dates_success_msg)
@@ -161,13 +161,13 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
                                     datePostedCalendar.time = Date(posted.toLong(10) * 1000)
 
                                     val taken = it.getAttributeValue(null, "taken")
-                                    dateDakenCalender.time = dateFormat.parse(taken)
+                                    dateTakenCalender.time = dateFormat.parse(taken)
 
                                     updateDateTimeFields()
 
-                                    val takengranularity = it.getAttributeValue(null, "takengranularity")
+                                    val takenGranularity = it.getAttributeValue(null, "takengranularity")
                                     findViewById<Spinner>(R.id.date_taken_granularity_spinner).setSelection(
-                                            getDateGranularityPosFromValue(takengranularity.toInt(10)))
+                                            getDateGranularityPosFromValue(takenGranularity.toInt(10)))
                                 }
                             }
                             eventType = it.next()
@@ -205,9 +205,9 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
             findViewById<Spinner>(R.id.date_taken_granularity_spinner).isEnabled = checked
         }
         findViewById<EditText>(R.id.date_taken_date)
-                .setText("%1\$tF".format(dateDakenCalender), TextView.BufferType.NORMAL)
+                .setText("%1\$tF".format(dateTakenCalender), TextView.BufferType.NORMAL)
         findViewById<EditText>(R.id.date_taken_time)
-                .setText("%1\$tT".format(dateDakenCalender), TextView.BufferType.NORMAL)
+                .setText("%1\$tT".format(dateTakenCalender), TextView.BufferType.NORMAL)
     }
 
     private fun getDateGranularityPosFromValue(granularityValue: Int): Int {

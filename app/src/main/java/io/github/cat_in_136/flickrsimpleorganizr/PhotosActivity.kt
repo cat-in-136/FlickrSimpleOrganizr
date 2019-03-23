@@ -97,7 +97,7 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
         }
     }
 
-    suspend fun checkAccessToken() = async {
+    private suspend fun checkAccessToken() = async {
         assert(flickrClient?.accessToken != null)
         try {
             val testRequest = OAuthRequest(Verb.GET, "https://api.flickr.com/services/rest/")
@@ -108,7 +108,7 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
         }
     }
 
-    suspend fun loadPhotos() = async {
+    private suspend fun loadPhotos() = async {
         assert(flickrClient?.accessToken != null)
 
         try {
@@ -169,31 +169,27 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
         private val mSelection = mutableSetOf<Int>()
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val gridItemView = if (convertView == null) {
-                LayoutInflater.from(parent.context)
-                        .inflate(R.layout.photo_gridview, parent, false).apply {
-                            setOnLongClickListener {
-                                return@setOnLongClickListener parent.performLongClick()
-                            }
-                            findViewById<CheckBox>(R.id.photo_gridview_check_box).apply {
-                                tag = position
-                                isChecked = this@PhotoGridViewAdapter.isPositionChecked(position)
+            val gridItemView = convertView?.apply {
+                findViewById<CheckBox>(R.id.photo_gridview_check_box).apply {
+                    tag = position
+                    isChecked = isPositionChecked(position)
+                }
+            } ?: LayoutInflater.from(parent.context)
+                    .inflate(R.layout.photo_gridview, parent, false).apply {
+                        setOnLongClickListener {
+                            return@setOnLongClickListener parent.performLongClick()
+                        }
+                        findViewById<CheckBox>(R.id.photo_gridview_check_box).apply {
+                            tag = position
+                            isChecked = this@PhotoGridViewAdapter.isPositionChecked(position)
 
-                                setOnClickListener { view ->
-                                    (tag as? Int)?.let {
-                                        this@PhotoGridViewAdapter.setNewSelection(it, isChecked)
-                                    }
+                            setOnClickListener { view ->
+                                (tag as? Int)?.let {
+                                    this@PhotoGridViewAdapter.setNewSelection(it, isChecked)
                                 }
                             }
                         }
-            } else {
-                convertView.apply {
-                    findViewById<CheckBox>(R.id.photo_gridview_check_box).apply {
-                        tag = position
-                        isChecked = isPositionChecked(position)
                     }
-                }
-            }
 
             val photo = getItem(position)
             gridItemView.findViewById<TextView>(R.id.photo_gridview_text_view).text = photo["title"]

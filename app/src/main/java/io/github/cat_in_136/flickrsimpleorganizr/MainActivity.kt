@@ -83,13 +83,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                                 continuation.resume(verifyTextEditView.text.toString())
                                 dialogInterface.dismiss()
                             }
-                            .setNegativeButton(android.R.string.cancel, { dialogInterface, _ ->
+                            .setNegativeButton(android.R.string.cancel) { dialogInterface, _ ->
                                 dialogInterface.cancel()
-                            })
-                            .setOnCancelListener({ dialogInterface ->
+                            }
+                            .setOnCancelListener { dialogInterface ->
                                 continuation.resume("")
                                 dialogInterface.dismiss()
-                            })
+                            }
                             .show()
                 }
 

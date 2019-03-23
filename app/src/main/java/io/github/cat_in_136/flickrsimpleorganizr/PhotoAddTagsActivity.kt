@@ -62,7 +62,7 @@ class PhotoAddTagsActivity : AppCompatActivity(), CoroutineScope {
             }
 
             if (ret.any { return@any it.first != 200 }) {
-                val errorSummay = photos!!.mapIndexed { index, photo ->
+                val errorSummary = photos!!.mapIndexed { index, photo ->
                     if (ret[index].first != 200) {
                         "${photo["title"]} ${photo["id"]} : NG"
                     } else {
@@ -71,7 +71,7 @@ class PhotoAddTagsActivity : AppCompatActivity(), CoroutineScope {
                 }.filterNotNull().joinToString("\n")
 
                 alert(this@PhotoAddTagsActivity,
-                        resources.getString(R.string.photo_add_tags_failed_msg) + "\n\n" + errorSummay,
+                        resources.getString(R.string.photo_add_tags_failed_msg) + "\n\n" + errorSummary,
                         this@PhotoAddTagsActivity.getString(android.R.string.dialog_alert_title))
             } else {
                 alert(this@PhotoAddTagsActivity, R.string.photo_add_tags_success_msg)

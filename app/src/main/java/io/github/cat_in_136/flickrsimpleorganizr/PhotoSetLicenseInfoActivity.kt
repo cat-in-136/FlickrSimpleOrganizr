@@ -133,7 +133,7 @@ class PhotoSetLicenseInfoActivity : AppCompatActivity(), CoroutineScope {
             }
 
             if (ret.any { return@any it.first != 200 }) {
-                val errorSummay = photos!!.mapIndexed { index, photo ->
+                val errorSummary = photos!!.mapIndexed { index, photo ->
                     if (ret[index].first != 200) {
                         "${photo["title"]} ${photo["id"]} : NG"
                     } else {
@@ -142,7 +142,7 @@ class PhotoSetLicenseInfoActivity : AppCompatActivity(), CoroutineScope {
                 }.filterNotNull().joinToString("\n")
 
                 alert(this@PhotoSetLicenseInfoActivity,
-                        getResources().getString(R.string.photo_set_license_failed_msg) + "\n\n" + errorSummay,
+                        resources.getString(R.string.photo_set_license_failed_msg) + "\n\n" + errorSummary,
                         this@PhotoSetLicenseInfoActivity.getString(android.R.string.dialog_alert_title))
             } else {
                 alert(this@PhotoSetLicenseInfoActivity, R.string.photo_set_license_success_msg)

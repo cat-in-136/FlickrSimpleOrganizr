@@ -11,7 +11,7 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class FlickrClient(apiKey: String, sharedSecret: String, parentJob: Job?) : CoroutineScope {
-    private var job: Job
+    private var job: Job = Job(parentJob)
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default + this.job
@@ -21,7 +21,6 @@ class FlickrClient(apiKey: String, sharedSecret: String, parentJob: Job?) : Coro
     var accessToken : OAuth1AccessToken? = null
 
     init {
-        this.job = Job(parentJob)
         this.oauthService = ServiceBuilder(apiKey)
                 .apiSecret(sharedSecret)
                 .build(FlickrApi.instance(FlickrApi.FlickrPerm.WRITE))
