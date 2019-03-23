@@ -18,7 +18,7 @@ import kotlin.coroutines.CoroutineContext
 
 
 class PhotoSetLicenseInfoActivity : AppCompatActivity(), CoroutineScope {
-    internal val job = Job()
+    private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 

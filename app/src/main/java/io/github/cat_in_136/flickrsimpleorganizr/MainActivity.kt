@@ -21,7 +21,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class MainActivity : AppCompatActivity(), CoroutineScope {
-    internal val job = Job()
+    private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 
@@ -79,10 +79,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                     AlertDialog.Builder(this@MainActivity)
                             .setTitle(R.string.login_verify_key_label)
                             .setView(verifyTextEditView)
-                            .setPositiveButton(android.R.string.ok, { dialogInterface, _ ->
+                            .setPositiveButton(android.R.string.ok) { dialogInterface, _ ->
                                 continuation.resume(verifyTextEditView.text.toString())
                                 dialogInterface.dismiss()
-                            })
+                            }
                             .setNegativeButton(android.R.string.cancel, { dialogInterface, _ ->
                                 dialogInterface.cancel()
                             })

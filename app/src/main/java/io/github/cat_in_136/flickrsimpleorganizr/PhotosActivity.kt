@@ -24,7 +24,7 @@ import org.xmlpull.v1.XmlPullParserFactory
 import kotlin.coroutines.CoroutineContext
 
 class PhotosActivity : AppCompatActivity(), CoroutineScope {
-    internal val job = Job()
+    private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 
@@ -205,7 +205,7 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
                             .error(ColorDrawable(Color.RED))
                             .centerCrop())
                     .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(gridItemView.findViewById<ImageView>(R.id.photo_gridview_image_view))
+                    .into(gridItemView.findViewById(R.id.photo_gridview_image_view))
 
             gridItemView.findViewById<ImageView>(R.id.photo_gridview_lockicon).apply {
                 visibility = if (photo["ispublic"] == "1") View.GONE else View.VISIBLE
@@ -240,7 +240,7 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
     }
 
     companion object {
-        val EXTRA_FLICKR_ACCESS_TOKEN = "io.github.cat_in_136.flickrsimpleorganizr.EXTRA_FLICKR_ACCESS_TOKEN"
-        val EXTRA_FLICKR_PHOTOS = "io.github.cat_in_136.flickrsimpleorganizr.EXTRA_FLICKR_PHOTOS"
+        const val EXTRA_FLICKR_ACCESS_TOKEN = "io.github.cat_in_136.flickrsimpleorganizr.EXTRA_FLICKR_ACCESS_TOKEN"
+        const val EXTRA_FLICKR_PHOTOS = "io.github.cat_in_136.flickrsimpleorganizr.EXTRA_FLICKR_PHOTOS"
     }
 }

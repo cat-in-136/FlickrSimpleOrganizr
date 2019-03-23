@@ -11,14 +11,14 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class FlickrClient : CoroutineScope {
-    internal var job: Job
+    private var job: Job
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default + this.job
 
     private val oauthService: OAuth10aService
 
-    public var accessToken : OAuth1AccessToken? = null
+    var accessToken : OAuth1AccessToken? = null
 
     constructor (apiKey: String, sharedSecret: String, parentJob: Job?) {
         this.job = Job(parentJob)
@@ -27,7 +27,7 @@ class FlickrClient : CoroutineScope {
                 .build(FlickrApi.instance(FlickrApi.FlickrPerm.WRITE))
     }
 
-    suspend fun userAuthStep1To2(): Deferred<Pair<OAuth1RequestToken, String>> = async {
+    fun userAuthStep1To2(): Deferred<Pair<OAuth1RequestToken, String>> = async {
         accessToken = null
         val requestToken = oauthService.requestToken
         val authURL = oauthService.getAuthorizationUrl(requestToken)
@@ -35,7 +35,7 @@ class FlickrClient : CoroutineScope {
         return@async Pair(requestToken, authURL)
     }
 
-    suspend fun userAuthStep3(requestToken: OAuth1RequestToken, verifierCode: String) = async {
+    fun userAuthStep3(requestToken: OAuth1RequestToken, verifierCode: String) = async {
         accessToken = oauthService.getAccessToken(requestToken, verifierCode)
         return@async accessToken
     }

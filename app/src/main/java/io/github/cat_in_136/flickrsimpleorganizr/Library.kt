@@ -31,6 +31,6 @@ internal suspend fun alert(context: Context, message: String, title: String? = n
 }
 
 private suspend fun alert(builder: AlertDialog.Builder) = suspendCoroutine<Nothing?> { continuation ->
-    builder.setOnDismissListener({ continuation.resume(null) })
+    builder.setOnDismissListener { continuation.resume(null) }
             .show()
 }

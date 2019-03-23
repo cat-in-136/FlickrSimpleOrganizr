@@ -25,7 +25,7 @@ import java.util.*
 
 
 class EditDateActivity : AppCompatActivity(), CoroutineScope {
-    internal val job = Job()
+    private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 

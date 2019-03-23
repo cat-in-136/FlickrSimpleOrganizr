@@ -2,10 +2,8 @@ package io.github.cat_in_136.flickrsimpleorganizr
 
 import android.annotation.TargetApi
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
-import android.preference.EditTextPreference
 import android.preference.Preference
 import android.preference.PreferenceActivity
 import android.preference.PreferenceFragment
@@ -58,7 +56,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         }
 
         companion object {
-            val KEY_LOGOUT = "preference_account_logout"
+            const val KEY_LOGOUT = "preference_account_logout"
             val KEY_OAUTH_API_KEY = "preference_account_oauth_api_key"
             val KEY_OAUTH_SHARED_SECRET = "preference_account_oauth_shared_secret"
         }

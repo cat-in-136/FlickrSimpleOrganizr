@@ -2,7 +2,6 @@ package io.github.cat_in_136.flickrsimpleorganizr
 
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Button
@@ -17,7 +16,7 @@ import kotlinx.coroutines.async
 import kotlin.coroutines.CoroutineContext
 
 class PhotoAddTagsActivity : AppCompatActivity(), CoroutineScope {
-    internal val job = Job()
+    private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 
