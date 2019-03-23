@@ -10,7 +10,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class FlickrClient : CoroutineScope {
+class FlickrClient(apiKey: String, sharedSecret: String, parentJob: Job?) : CoroutineScope {
     private var job: Job
 
     override val coroutineContext: CoroutineContext
@@ -20,7 +20,7 @@ class FlickrClient : CoroutineScope {
 
     var accessToken : OAuth1AccessToken? = null
 
-    constructor (apiKey: String, sharedSecret: String, parentJob: Job?) {
+    init {
         this.job = Job(parentJob)
         this.oauthService = ServiceBuilder(apiKey)
                 .apiSecret(sharedSecret)

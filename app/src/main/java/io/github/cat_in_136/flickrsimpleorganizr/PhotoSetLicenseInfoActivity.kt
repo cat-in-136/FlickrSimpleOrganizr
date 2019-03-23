@@ -121,7 +121,7 @@ class PhotoSetLicenseInfoActivity : AppCompatActivity(), CoroutineScope {
             }
         }
 
-        async {
+        launch {
             val ret = photos!!.map {
                 val request = OAuthRequest(Verb.GET, "https://api.flickr.com/services/rest/")
                 request.addQuerystringParameter("method", "flickr.photos.licenses.setLicense")
@@ -132,9 +132,9 @@ class PhotoSetLicenseInfoActivity : AppCompatActivity(), CoroutineScope {
                 return@map Pair(code, body)
             }
 
-            if (ret!!.any { return@any it.first != 200 }) {
+            if (ret.any { return@any it.first != 200 }) {
                 val errorSummay = photos!!.mapIndexed { index, photo ->
-                    if (ret!![index].first != 200) {
+                    if (ret[index].first != 200) {
                         "${photo["title"]} ${photo["id"]} : NG"
                     } else {
                         null

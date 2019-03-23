@@ -65,9 +65,9 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
 
         val isAnySelected = photoGridViewAdapter.getCheckedItemCount() > 0
 
-        menu.findItem(R.id.photo_gridview_popup_item_add_tags).setVisible(isAnySelected)
-        menu.findItem(R.id.photo_gridview_popup_item_edit_dates).setVisible(isAnySelected)
-        menu.findItem(R.id.photo_gridview_popup_item_set_license_info).setVisible(isAnySelected)
+        menu.findItem(R.id.photo_gridview_popup_item_add_tags).isVisible = isAnySelected
+        menu.findItem(R.id.photo_gridview_popup_item_edit_dates).isVisible = isAnySelected
+        menu.findItem(R.id.photo_gridview_popup_item_set_license_info).isVisible = isAnySelected
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -101,8 +101,8 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
         assert(flickrClient?.accessToken != null)
         try {
             val testRequest = OAuthRequest(Verb.GET, "https://api.flickr.com/services/rest/")
-            testRequest.addQuerystringParameter("method", "flickr.test.login");
-            val (code, headers, body) = flickrClient!!.access(testRequest).await()
+            testRequest.addQuerystringParameter("method", "flickr.test.login")
+            val (_, _, _) = flickrClient!!.access(testRequest).await()
         } catch (e : Exception) {
             finishByException(e, "Test Access").await()
         }
@@ -113,9 +113,9 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
 
         try {
             val request = OAuthRequest(Verb.GET, "https://api.flickr.com/services/rest/")
-            request.addQuerystringParameter("method", "flickr.people.getPhotos");
+            request.addQuerystringParameter("method", "flickr.people.getPhotos")
             request.addQuerystringParameter("user_id", "me")
-            val (code, headers, body) = flickrClient!!.access(request).await()
+            val (_, _, body) = flickrClient!!.access(request).await()
 
 
             Log.d("Photos", "getPhotos ${body}")

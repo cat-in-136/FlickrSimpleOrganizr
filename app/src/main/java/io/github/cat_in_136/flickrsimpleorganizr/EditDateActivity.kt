@@ -1,5 +1,6 @@
 package io.github.cat_in_136.flickrsimpleorganizr
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -11,12 +12,9 @@ import android.widget.*
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuthRequest
 import com.github.scribejava.core.model.Verb
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlin.coroutines.CoroutineContext
 import com.ikovac.timepickerwithseconds.MyTimePickerDialog
+import kotlinx.coroutines.*
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
@@ -107,7 +105,7 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
 
         assert(photos != null)
 
-        async {
+        launch {
             val ret = photos!!.map {
                 val request = OAuthRequest(Verb.GET, "https://api.flickr.com/services/rest/")
                 request.addQuerystringParameter("method", "flickr.photos.setDates")
@@ -142,13 +140,14 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
     }
 
     private fun retrieveDatesFromPhoto(photo: HashMap<String, String>) {
-        async {
+        launch {
             val request = OAuthRequest(Verb.GET, "https://api.flickr.com/services/rest/")
             request.addQuerystringParameter("method", "flickr.photos.getInfo")
             request.addQuerystringParameter("photo_id", photo["id"])
             val (code, _, body) = flickrClient!!.access(request).await()
 
             if (code == 200) {
+                @SuppressLint("SimpleDateFormat")
                 val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
                 XmlPullParserFactory.newInstance().newPullParser().let {
@@ -181,6 +180,7 @@ class EditDateActivity : AppCompatActivity(), CoroutineScope {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateDateTimeFields() {
         findViewById<CheckBox>(R.id.date_posted_checkbox).isChecked.let { checked ->
             findViewById<EditText>(R.id.date_posted_date).isEnabled = checked
