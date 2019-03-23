@@ -1,15 +1,14 @@
 package io.github.cat_in_136.flickrsimpleorganizr
 
-import android.os.AsyncTask
 import com.github.scribejava.apis.FlickrApi
 import com.github.scribejava.core.builder.ServiceBuilder
 import com.github.scribejava.core.model.*
 import com.github.scribejava.core.oauth.OAuth10aService
-import com.github.scribejava.core.oauth.OAuthService
-import kotlinx.coroutines.experimental.*
-import java.io.IOException
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.suspendCoroutine
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class FlickrClient : CoroutineScope {
     internal var job: Job

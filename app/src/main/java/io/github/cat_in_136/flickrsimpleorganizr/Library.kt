@@ -3,7 +3,8 @@ package io.github.cat_in_136.flickrsimpleorganizr
 import android.content.Context
 import android.support.annotation.StringRes
 import android.support.v7.app.AlertDialog
-import kotlin.coroutines.experimental.suspendCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 internal suspend fun alert(context: Context, @StringRes messageId: Int, @StringRes titleId: Int = -1) {
     AlertDialog.Builder(context)
