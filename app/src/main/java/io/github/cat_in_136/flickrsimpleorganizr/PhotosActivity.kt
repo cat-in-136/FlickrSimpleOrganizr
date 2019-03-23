@@ -68,6 +68,7 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
 
         menu.findItem(R.id.photo_gridview_popup_item_add_tags).setVisible(isAnySelected)
         menu.findItem(R.id.photo_gridview_popup_item_edit_dates).setVisible(isAnySelected)
+        menu.findItem(R.id.photo_gridview_popup_item_set_license_info).setVisible(isAnySelected)
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -81,6 +82,13 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
             }
             R.id.photo_gridview_popup_item_edit_dates -> {
                 val intent = Intent(this, EditDateActivity::class.java)
+                intent.putExtra(EXTRA_FLICKR_ACCESS_TOKEN, flickrClient?.accessToken)
+                intent.putExtra(EXTRA_FLICKR_PHOTOS, photoGridViewAdapter.getCheckedItems())
+                startActivity(intent)
+                return true
+            }
+            R.id.photo_gridview_popup_item_set_license_info -> {
+                val intent = Intent(this, PhotoSetLicenseInfoActivity::class.java)
                 intent.putExtra(EXTRA_FLICKR_ACCESS_TOKEN, flickrClient?.accessToken)
                 intent.putExtra(EXTRA_FLICKR_PHOTOS, photoGridViewAdapter.getCheckedItems())
                 startActivity(intent)
