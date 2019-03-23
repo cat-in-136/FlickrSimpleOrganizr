@@ -22,6 +22,7 @@
         android:id="@+id/photo_set_license_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:enabled="false"
         android:onClick="onSetLicense"
         android:text="@string/photo_set_license_info" />
 

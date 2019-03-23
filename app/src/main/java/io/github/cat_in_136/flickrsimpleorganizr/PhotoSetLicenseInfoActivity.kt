@@ -67,6 +67,11 @@ class PhotoSetLicenseInfoActivity : AppCompatActivity(), CoroutineScope {
             progressBar.visibility = View.GONE
             radioGroup.visibility = View.VISIBLE
         }
+
+        radioGroup.setOnCheckedChangeListener { _, _ ->
+            val button = findViewById<Button>(R.id.photo_set_license_button)
+            button.isEnabled = true
+        }
     }
 
     private fun fetchListOfAvailablePhotoLicenses() = async(Dispatchers.Default) {
