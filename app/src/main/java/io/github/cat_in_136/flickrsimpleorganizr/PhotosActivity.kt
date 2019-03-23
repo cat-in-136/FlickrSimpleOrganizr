@@ -17,15 +17,14 @@ import com.bumptech.glide.request.RequestOptions
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuthRequest
 import com.github.scribejava.core.model.Verb
-import kotlinx.coroutines.experimental.*
-import kotlinx.coroutines.experimental.android.Main
+import kotlinx.coroutines.*
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 class PhotosActivity : AppCompatActivity(), CoroutineScope {
-    internal val job = Job()
+    private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 
@@ -66,9 +65,9 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
 
         val isAnySelected = photoGridViewAdapter.getCheckedItemCount() > 0
 
-        menu.findItem(R.id.photo_gridview_popup_item_add_tags).setVisible(isAnySelected)
-        menu.findItem(R.id.photo_gridview_popup_item_edit_dates).setVisible(isAnySelected)
-        menu.findItem(R.id.photo_gridview_popup_item_set_license_info).setVisible(isAnySelected)
+        menu.findItem(R.id.photo_gridview_popup_item_add_tags).isVisible = isAnySelected
+        menu.findItem(R.id.photo_gridview_popup_item_edit_dates).isVisible = isAnySelected
+        menu.findItem(R.id.photo_gridview_popup_item_set_license_info).isVisible = isAnySelected
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -98,25 +97,25 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
         }
     }
 
-    suspend fun checkAccessToken() = async {
+    private suspend fun checkAccessToken() = async {
         assert(flickrClient?.accessToken != null)
         try {
             val testRequest = OAuthRequest(Verb.GET, "https://api.flickr.com/services/rest/")
-            testRequest.addQuerystringParameter("method", "flickr.test.login");
-            val (code, headers, body) = flickrClient!!.access(testRequest).await()
+            testRequest.addQuerystringParameter("method", "flickr.test.login")
+            val (_, _, _) = flickrClient!!.access(testRequest).await()
         } catch (e : Exception) {
             finishByException(e, "Test Access").await()
         }
     }
 
-    suspend fun loadPhotos() = async {
+    private suspend fun loadPhotos() = async {
         assert(flickrClient?.accessToken != null)
 
         try {
             val request = OAuthRequest(Verb.GET, "https://api.flickr.com/services/rest/")
-            request.addQuerystringParameter("method", "flickr.people.getPhotos");
+            request.addQuerystringParameter("method", "flickr.people.getPhotos")
             request.addQuerystringParameter("user_id", "me")
-            val (code, headers, body) = flickrClient!!.access(request).await()
+            val (_, _, body) = flickrClient!!.access(request).await()
 
 
             Log.d("Photos", "getPhotos ${body}")
@@ -170,31 +169,27 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
         private val mSelection = mutableSetOf<Int>()
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val gridItemView = if (convertView == null) {
-                LayoutInflater.from(parent.context)
-                        .inflate(R.layout.photo_gridview, parent, false).apply {
-                            setOnLongClickListener {
-                                return@setOnLongClickListener parent.performLongClick()
-                            }
-                            findViewById<CheckBox>(R.id.photo_gridview_check_box).apply {
-                                tag = position
-                                isChecked = this@PhotoGridViewAdapter.isPositionChecked(position)
+            val gridItemView = convertView?.apply {
+                findViewById<CheckBox>(R.id.photo_gridview_check_box).apply {
+                    tag = position
+                    isChecked = isPositionChecked(position)
+                }
+            } ?: LayoutInflater.from(parent.context)
+                    .inflate(R.layout.photo_gridview, parent, false).apply {
+                        setOnLongClickListener {
+                            return@setOnLongClickListener parent.performLongClick()
+                        }
+                        findViewById<CheckBox>(R.id.photo_gridview_check_box).apply {
+                            tag = position
+                            isChecked = this@PhotoGridViewAdapter.isPositionChecked(position)
 
-                                setOnClickListener { view ->
-                                    (tag as? Int)?.let {
-                                        this@PhotoGridViewAdapter.setNewSelection(it, isChecked)
-                                    }
+                            setOnClickListener { view ->
+                                (tag as? Int)?.let {
+                                    this@PhotoGridViewAdapter.setNewSelection(it, isChecked)
                                 }
                             }
                         }
-            } else {
-                convertView.apply {
-                    findViewById<CheckBox>(R.id.photo_gridview_check_box).apply {
-                        tag = position
-                        isChecked = isPositionChecked(position)
                     }
-                }
-            }
 
             val photo = getItem(position)
             gridItemView.findViewById<TextView>(R.id.photo_gridview_text_view).text = photo["title"]
@@ -206,7 +201,7 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
                             .error(ColorDrawable(Color.RED))
                             .centerCrop())
                     .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(gridItemView.findViewById<ImageView>(R.id.photo_gridview_image_view))
+                    .into(gridItemView.findViewById(R.id.photo_gridview_image_view))
 
             gridItemView.findViewById<ImageView>(R.id.photo_gridview_lockicon).apply {
                 visibility = if (photo["ispublic"] == "1") View.GONE else View.VISIBLE
@@ -241,7 +236,7 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
     }
 
     companion object {
-        val EXTRA_FLICKR_ACCESS_TOKEN = "io.github.cat_in_136.flickrsimpleorganizr.EXTRA_FLICKR_ACCESS_TOKEN"
-        val EXTRA_FLICKR_PHOTOS = "io.github.cat_in_136.flickrsimpleorganizr.EXTRA_FLICKR_PHOTOS"
+        const val EXTRA_FLICKR_ACCESS_TOKEN = "io.github.cat_in_136.flickrsimpleorganizr.EXTRA_FLICKR_ACCESS_TOKEN"
+        const val EXTRA_FLICKR_PHOTOS = "io.github.cat_in_136.flickrsimpleorganizr.EXTRA_FLICKR_PHOTOS"
     }
 }

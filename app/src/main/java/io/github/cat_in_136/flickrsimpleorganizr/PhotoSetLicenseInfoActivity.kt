@@ -9,18 +9,16 @@ import android.widget.*
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuthRequest
 import com.github.scribejava.core.model.Verb
-import kotlinx.coroutines.experimental.*
-import kotlinx.coroutines.experimental.android.Main
-import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.*
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
 import java.util.*
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 
 class PhotoSetLicenseInfoActivity : AppCompatActivity(), CoroutineScope {
-    internal val job = Job()
+    private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 
@@ -123,7 +121,7 @@ class PhotoSetLicenseInfoActivity : AppCompatActivity(), CoroutineScope {
             }
         }
 
-        async {
+        launch {
             val ret = photos!!.map {
                 val request = OAuthRequest(Verb.GET, "https://api.flickr.com/services/rest/")
                 request.addQuerystringParameter("method", "flickr.photos.licenses.setLicense")
@@ -134,9 +132,9 @@ class PhotoSetLicenseInfoActivity : AppCompatActivity(), CoroutineScope {
                 return@map Pair(code, body)
             }
 
-            if (ret!!.any { return@any it.first != 200 }) {
-                val errorSummay = photos!!.mapIndexed { index, photo ->
-                    if (ret!![index].first != 200) {
+            if (ret.any { return@any it.first != 200 }) {
+                val errorSummary = photos!!.mapIndexed { index, photo ->
+                    if (ret[index].first != 200) {
                         "${photo["title"]} ${photo["id"]} : NG"
                     } else {
                         null
@@ -144,7 +142,7 @@ class PhotoSetLicenseInfoActivity : AppCompatActivity(), CoroutineScope {
                 }.filterNotNull().joinToString("\n")
 
                 alert(this@PhotoSetLicenseInfoActivity,
-                        getResources().getString(R.string.photo_set_license_failed_msg) + "\n\n" + errorSummay,
+                        resources.getString(R.string.photo_set_license_failed_msg) + "\n\n" + errorSummary,
                         this@PhotoSetLicenseInfoActivity.getString(android.R.string.dialog_alert_title))
             } else {
                 alert(this@PhotoSetLicenseInfoActivity, R.string.photo_set_license_success_msg)

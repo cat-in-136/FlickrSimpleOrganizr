@@ -15,13 +15,13 @@ import android.widget.EditText
 import com.github.scribejava.core.model.OAuth1AccessToken
 import com.github.scribejava.core.model.OAuthRequest
 import com.github.scribejava.core.model.Verb
-import kotlinx.coroutines.experimental.*
-import kotlinx.coroutines.experimental.android.Main
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.suspendCoroutine
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class MainActivity : AppCompatActivity(), CoroutineScope {
-    internal val job = Job()
+    private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     }
 
     private fun startLoginToFlickr(view : View) {
-        async {
+        launch {
             findViewById<Button>(R.id.login_button).isEnabled = false
 
             val (apiKey, sharedSecret) = PreferenceManager.getDefaultSharedPreferences(this@MainActivity).let {
@@ -59,10 +59,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 )
             }
             if (TextUtils.isEmpty(apiKey) || TextUtils.isEmpty(sharedSecret)) {
-                alert(this@MainActivity, R.string.login_oauth_setting_missing_err_msg);
+                alert(this@MainActivity, R.string.login_oauth_setting_missing_err_msg)
                 launch { startSettingActivity(view) }
                 findViewById<Button>(R.id.login_button).isEnabled = true
-                return@async
+                return@launch
             }
             val flickrClient = FlickrClient(apiKey, sharedSecret, job)
 
@@ -79,23 +79,23 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                     AlertDialog.Builder(this@MainActivity)
                             .setTitle(R.string.login_verify_key_label)
                             .setView(verifyTextEditView)
-                            .setPositiveButton(android.R.string.ok, { dialogInterface, _ ->
+                            .setPositiveButton(android.R.string.ok) { dialogInterface, _ ->
                                 continuation.resume(verifyTextEditView.text.toString())
                                 dialogInterface.dismiss()
-                            })
-                            .setNegativeButton(android.R.string.cancel, { dialogInterface, _ ->
+                            }
+                            .setNegativeButton(android.R.string.cancel) { dialogInterface, _ ->
                                 dialogInterface.cancel()
-                            })
-                            .setOnCancelListener({ dialogInterface ->
+                            }
+                            .setOnCancelListener { dialogInterface ->
                                 continuation.resume("")
                                 dialogInterface.dismiss()
-                            })
+                            }
                             .show()
                 }
 
                 if (TextUtils.isEmpty(verifyCode)) {
                     findViewById<Button>(R.id.login_button).isEnabled = true
-                    return@async
+                    return@launch
                 } else {
                     try {
                         accessToken = flickrClient.userAuthStep3(requestToken, verifyCode).await()
@@ -108,8 +108,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                     assert(accessToken == flickrClient.accessToken)
                     try {
                         val testRequest = OAuthRequest(Verb.GET, "https://api.flickr.com/services/rest/")
-                        testRequest.addQuerystringParameter("method", "flickr.test.login");
-                        val (code, headers, body) = flickrClient.access(testRequest).await()
+                        testRequest.addQuerystringParameter("method", "flickr.test.login")
+                        val (_, _, _) = flickrClient.access(testRequest).await()
 
                         storeFlickrAccessToken(this@MainActivity, accessToken)
                         startFlickr(view)

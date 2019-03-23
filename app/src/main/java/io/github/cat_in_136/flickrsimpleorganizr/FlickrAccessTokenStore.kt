@@ -30,5 +30,5 @@ fun retrieveFlickrAccessToken(context: Context) : OAuth1AccessToken? {
     }
 }
 
-private val PREF_KEY_FLICKR_ACCESS_TOKEN = "accessToken.token"
-private val PREF_KEY_FLICKR_ACCESS_TOKEN_SECRET = "accessToken.tokenSecret"
+private const val PREF_KEY_FLICKR_ACCESS_TOKEN = "accessToken.token"
+private const val PREF_KEY_FLICKR_ACCESS_TOKEN_SECRET = "accessToken.tokenSecret"
