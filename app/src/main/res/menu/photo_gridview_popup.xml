@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+<menu
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
@@ -8,4 +8,7 @@
     <item
         android:id="@+id/photo_gridview_popup_item_edit_dates"
         android:title="@string/edit_dates" />
+    <item
+        android:id="@+id/photo_gridview_popup_item_set_license_info"
+        android:title="@string/photo_set_license_info" />
 </menu>
