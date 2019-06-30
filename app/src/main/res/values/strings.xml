@@ -39,5 +39,6 @@
     <string name="photo_set_license_info">Set License Info</string>
     <string name="photo_set_license_failed_msg">Failed to change license</string>
     <string name="photo_set_license_success_msg">Successfully completed</string>
+    <string name="photo_open_url">Open URL</string>
 
 </resources>
