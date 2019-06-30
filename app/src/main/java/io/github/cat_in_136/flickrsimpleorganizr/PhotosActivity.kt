@@ -22,6 +22,9 @@ import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
 import kotlin.coroutines.CoroutineContext
+import android.net.Uri
+
+
 
 class PhotosActivity : AppCompatActivity(), CoroutineScope {
     private val job = Job()
@@ -65,6 +68,7 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
 
         val isAnySelected = photoGridViewAdapter.getCheckedItemCount() > 0
 
+        menu.findItem(R.id.photo_gridview_popup_item_open_url).isVisible = isAnySelected
         menu.findItem(R.id.photo_gridview_popup_item_add_tags).isVisible = isAnySelected
         menu.findItem(R.id.photo_gridview_popup_item_edit_dates).isVisible = isAnySelected
         menu.findItem(R.id.photo_gridview_popup_item_set_license_info).isVisible = isAnySelected
@@ -72,6 +76,10 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.photo_gridview_popup_item_open_url -> {
+                openPhotoURL(photoGridViewAdapter.getCheckedItems()[0])
+                return true
+            }
             R.id.photo_gridview_popup_item_add_tags -> {
                 val intent = Intent(this, PhotoAddTagsActivity::class.java)
                 intent.putExtra(EXTRA_FLICKR_ACCESS_TOKEN, flickrClient?.accessToken)
@@ -95,6 +103,13 @@ class PhotosActivity : AppCompatActivity(), CoroutineScope {
             }
             else -> return super.onContextItemSelected(item)
         }
+    }
+
+    private fun openPhotoURL(photo: HashMap<String, String>) {
+        val url = "https://www.flickr.com/photos/${photo["owner"]}/${photo["id"]}"
+
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        startActivity(intent)
     }
 
     private suspend fun checkAccessToken() = async {
